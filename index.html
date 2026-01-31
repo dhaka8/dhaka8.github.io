@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Abbas vs Patwary</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -26,6 +29,7 @@
         overflow: hidden;
         touch-action: manipulation;
         color: #1e293b;
+        height: 100dvh; /* Use dynamic viewport height */
       }
 
       .font-bungee {
@@ -38,6 +42,8 @@
         border: 6px solid #1e293b;
         border-radius: 32px;
         box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.2);
+        max-height: 90vh;
+        overflow-y: auto;
       }
 
       .arcade-btn {
@@ -70,12 +76,12 @@
       .hole {
         position: relative;
         background: var(--soil);
-        border: 6px solid #451a03;
+        border: 4px solid #451a03;
         border-radius: 50%;
         aspect-ratio: 1/1;
         box-shadow:
-          inset 0 15px 30px rgba(0, 0, 0, 0.6),
-          0 8px 0px var(--grass);
+          inset 0 10px 20px rgba(0, 0, 0, 0.6),
+          0 4px 0px var(--grass);
         overflow: hidden;
         cursor: pointer;
       }
@@ -100,6 +106,11 @@
 
       .hole.up .character {
         bottom: 10%;
+      }
+
+      .game-container {
+        max-height: 60vh; /* Prevents grid from pushing off screen on mobile */
+        margin: 0 auto;
       }
 
       /* Animations */
@@ -145,86 +156,87 @@
         position: absolute;
         pointer-events: none;
         font-family: "Bungee";
-        font-size: 2rem;
+        font-size: 1.5rem;
         animation: float-score 0.8s ease-out forwards;
         z-index: 100;
-        text-shadow: 3px 3px 0px black;
+        text-shadow: 2px 2px 0px black;
       }
 
       .grass-blade {
         position: absolute;
-        bottom: -5px;
+        bottom: -2px;
         width: 100%;
-        height: 20px;
+        height: 15px;
         background: #22c55e;
         border-radius: 20px 20px 0 0;
         z-index: 10;
       }
     </style>
   </head>
-  <body class="flex items-center justify-center min-h-screen p-4">
-    <!-- START SCREEN -->
+  <body class="flex items-center justify-center min-h-screen p-2">
     <div
       id="start-screen"
-      class="screen w-full max-w-lg arcade-card p-8 text-center space-y-8 z-50"
+      class="screen w-full max-w-lg arcade-card p-6 text-center space-y-6 z-50"
     >
       <div>
-        <h1 class="text-5xl font-bungee text-indigo-600 tracking-tighter">
+        <h1
+          class="text-4xl md:text-5xl font-bungee text-indigo-600 tracking-tighter"
+        >
           SMASH-UP!
         </h1>
         <p
-          class="text-indigo-400 mt-2 font-bold uppercase tracking-widest text-sm"
+          class="text-indigo-400 mt-1 font-bold uppercase tracking-widest text-xs"
         >
           Abbas vs Patwary
         </p>
       </div>
 
       <div class="space-y-4">
-        <p class="text-gray-500 font-bold text-sm">PICK YOUR CANDIDATE</p>
-        <div class="grid grid-cols-2 gap-6">
+        <p class="text-gray-500 font-bold text-xs">PICK YOUR CANDIDATE</p>
+        <div class="grid grid-cols-2 gap-4">
           <button
             onclick="selectChar('pat')"
             id="btn-pat"
-            class="char-btn p-4 rounded-3xl flex flex-col items-center"
+            class="char-btn p-3 rounded-2xl flex flex-col items-center"
           >
             <img
               src="pat.png"
               alt="Pat"
-              class="w-24 h-24 object-contain mb-2"
+              class="w-16 h-16 md:w-24 md:h-24 object-contain mb-2"
               onerror="
                 this.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=Pat'
               "
             />
-            <span class="font-bungee text-sm text-gray-700">Patwary</span>
+            <span class="font-bungee text-xs text-gray-700">Patwary</span>
           </button>
           <button
             onclick="selectChar('abbas')"
             id="btn-abbas"
-            class="char-btn p-4 rounded-3xl flex flex-col items-center"
+            class="char-btn p-3 rounded-2xl flex flex-col items-center"
           >
             <img
               src="abbas.png"
               alt="Abbas"
-              class="w-24 h-24 object-contain mb-2"
+              class="w-16 h-16 md:w-24 md:h-24 object-contain mb-2"
               onerror="
                 this.src =
                   'https://api.dicebear.com/7.x/avataaars/svg?seed=Abbas'
               "
             />
-            <span class="font-bungee text-sm text-gray-700">Abbas</span>
+            <span class="font-bungee text-xs text-gray-700">Abbas</span>
           </button>
         </div>
         <p
           id="target-desc"
-          class="text-xs text-gray-400 font-bold italic h-4"
+          class="text-[10px] text-gray-400 font-bold italic h-4"
         ></p>
       </div>
 
-      <div class="pt-4 border-t-2 border-dashed border-gray-200">
-        <p class="text-gray-400 text-[10px] font-black uppercase mb-1">
+      <div class="pt-2 border-t-2 border-dashed border-gray-200">
+        <p class="text-gray-400 text-[8px] font-black uppercase mb-1">
           Top Score
         </p>
-        <p id="high-score-start" class="text-3xl font-bungee text-yellow-500">
+        <p id="high-score-start" class="text-2xl font-bungee text-yellow-500">
           0
         </p>
       </div>
@@ -232,68 +244,61 @@
       <button
         onclick="startGame()"
         id="start-btn"
-        class="w-full py-5 arcade-btn font-bungee text-2xl rounded-2xl shadow-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        class="w-full py-4 arcade-btn font-bungee text-xl rounded-2xl shadow-xl disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         disabled
       >
         BATTLE!
       </button>
     </div>
 
-    <!-- GAME SCREEN -->
-    <div id="game-screen" class="screen hidden w-full max-w-2xl space-y-6">
-      <!-- Stats Bar -->
+    <div id="game-screen" class="screen hidden w-full max-w-md space-y-4">
       <div
-        class="grid grid-cols-3 gap-4 items-center bg-white p-4 rounded-3xl border-4 border-slate-800 shadow-xl"
+        class="grid grid-cols-3 gap-2 items-center bg-white p-3 rounded-2xl border-4 border-slate-800 shadow-lg"
       >
         <div
-          class="text-center bg-indigo-50 p-2 rounded-xl border-2 border-indigo-100"
+          class="text-center bg-indigo-50 p-1 rounded-xl border-2 border-indigo-100"
         >
-          <p class="text-[10px] text-indigo-400 font-black uppercase">Score</p>
-          <p id="score-val" class="text-4xl font-bungee text-indigo-600">0</p>
+          <p class="text-[8px] text-indigo-400 font-black uppercase">Score</p>
+          <p id="score-val" class="text-2xl font-bungee text-indigo-600">0</p>
         </div>
         <div class="text-center relative">
           <div
             id="combo-container"
-            class="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 transition-all"
+            class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 transition-all"
           >
-            <p class="text-xs text-orange-500 font-black uppercase">COMBO</p>
-            <p id="combo-val" class="text-2xl font-bungee text-orange-500">
-              x0
-            </p>
+            <p id="combo-val" class="text-lg font-bungee text-orange-500">x0</p>
           </div>
-          <p id="timer-val" class="text-5xl font-bungee text-red-500">30</p>
+          <p id="timer-val" class="text-3xl font-bungee text-red-500">30</p>
         </div>
         <div
-          class="text-center bg-emerald-50 p-2 rounded-xl border-2 border-emerald-100"
+          class="text-center bg-emerald-50 p-1 rounded-xl border-2 border-emerald-100"
         >
-          <p class="text-[10px] text-emerald-400 font-black uppercase">Level</p>
-          <p id="level-val" class="text-4xl font-bungee text-emerald-600">1</p>
+          <p class="text-[8px] text-emerald-400 font-black uppercase">Level</p>
+          <p id="level-val" class="text-2xl font-bungee text-emerald-600">1</p>
         </div>
       </div>
 
-      <!-- The Field -->
-      <div class="grid grid-cols-3 gap-4 md:gap-8 game-container p-4" id="grid">
-        <!-- Holes generated by JS -->
-      </div>
+      <div class="grid grid-cols-3 gap-3 game-container px-2" id="grid"></div>
     </div>
 
-    <!-- END SCREEN -->
     <div
       id="end-screen"
-      class="screen hidden w-full max-w-sm arcade-card p-10 text-center space-y-8 z-50"
+      class="screen hidden w-full max-w-xs arcade-card p-8 text-center space-y-6 z-50"
     >
-      <h2 class="text-5xl font-bungee text-red-600 -rotate-2">FINISH!</h2>
+      <h2 class="text-4xl font-bungee text-red-600 -rotate-2">FINISH!</h2>
 
-      <div class="bg-indigo-50 p-6 rounded-3xl border-4 border-indigo-100">
-        <p class="text-indigo-400 uppercase font-black text-xs tracking-widest">
+      <div class="bg-indigo-50 p-4 rounded-2xl border-4 border-indigo-100">
+        <p
+          class="text-indigo-400 uppercase font-black text-[10px] tracking-widest"
+        >
           Points Smashed
         </p>
-        <p id="final-score" class="text-7xl font-bungee text-indigo-600 my-2">
+        <p id="final-score" class="text-6xl font-bungee text-indigo-600 my-1">
           0
         </p>
         <p
           id="new-record"
-          class="text-orange-500 font-bungee text-sm hidden animate-bounce"
+          class="text-orange-500 font-bungee text-xs hidden animate-bounce"
         >
           NEW RECORD!
         </p>
@@ -301,14 +306,13 @@
 
       <button
         onclick="location.reload()"
-        class="w-full py-5 arcade-btn bg-indigo-600 border-indigo-900 font-bungee text-xl rounded-2xl shadow-xl transition-all"
+        class="w-full py-4 arcade-btn bg-indigo-600 border-indigo-900 font-bungee text-lg rounded-2xl shadow-xl transition-all"
       >
         PLAY AGAIN
       </button>
     </div>
 
     <script>
-      // Sound Engine
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       const ctx = new AudioCtx();
 
@@ -365,11 +369,9 @@
       let selectedCharacter = null;
       let timeLeft = 30;
 
-      // Initialize High Score
       const savedHigh = localStorage.getItem("arcade_smash_high") || 0;
       document.getElementById("high-score-start").textContent = savedHigh;
 
-      // Generate Grid
       for (let i = 0; i < 9; i++) {
         const hole = document.createElement("div");
         hole.className = "hole";
@@ -385,7 +387,7 @@
       const holes = document.querySelectorAll(".hole");
 
       function selectChar(char) {
-        ctx.resume(); // Resume audio context on user interaction
+        ctx.resume();
         selectedCharacter = char;
         document
           .querySelectorAll(".char-btn")
@@ -393,7 +395,7 @@
         document.getElementById(`btn-${char}`).classList.add("selected");
         document.getElementById("start-btn").disabled = false;
 
-        const target = char === "pat" ? "Abbas" : "Pat";
+        const target = char === "pat" ? "Abbas" : "Patwary";
         document.getElementById("target-desc").textContent =
           `Smash ${target}! Don't hit yourself!`;
         sounds.start();
@@ -414,12 +416,10 @@
       function peep() {
         const baseMin = Math.max(150, 700 - level * 50);
         const baseMax = Math.max(350, 1200 - level * 70);
-
         const time = randomTime(baseMin, baseMax);
         const hole = randomHole(holes);
         const charDiv = hole.querySelector(".character");
-
-        const isFriendly = Math.random() < 0.25; // 25% chance for own char
+        const isFriendly = Math.random() < 0.25;
         const charToShow = isFriendly
           ? selectedCharacter
           : selectedCharacter === "pat"
@@ -439,17 +439,14 @@
       function startGame() {
         startScreen.classList.add("hidden");
         gameScreen.classList.remove("hidden");
-
         score = 0;
         combo = 0;
         level = 1;
         timeLeft = 30;
         timeUp = false;
-
         updateScoreUI();
         peep();
 
-        // Add extra peeps as difficulty increases
         const extraPeepTimer = setInterval(() => {
           if (timeUp) clearInterval(extraPeepTimer);
           if (level >= 4) peep();
@@ -471,7 +468,7 @@
       }
 
       function whack(e, hole) {
-        if (e.type === "mousedown" && e.which !== 1) return; // Only left click
+        if (e.type === "mousedown" && e.which !== 1) return;
         if (!hole.classList.contains("up")) return;
 
         const isFriend = hole.dataset.type === "friend";
@@ -492,13 +489,11 @@
           score += points;
           sounds.hit();
           createPopup(clientX, clientY, `+${points}`, "text-indigo-600");
-
           if (score > 0 && score % 15 === 0) {
             level++;
             sounds.levelUp();
           }
         }
-
         hole.classList.remove("up");
         updateScoreUI();
       }
@@ -526,7 +521,6 @@
         gameScreen.classList.add("hidden");
         endScreen.classList.remove("hidden");
         document.getElementById("final-score").textContent = score;
-
         const high = localStorage.getItem("arcade_smash_high") || 0;
         if (score > high) {
           localStorage.setItem("arcade_smash_high", score);
